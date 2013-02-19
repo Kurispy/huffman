@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 #include <string>
 #include "Huffman.h"
 
@@ -23,7 +24,7 @@ int main(int argc, char* argv[]) {
         huff_tree.writeOut();
         
     }
-    else if ("-d" == argv[1]) {
+    else if (!strcmp("-d", argv[1])) {
         //Decompress
         
         

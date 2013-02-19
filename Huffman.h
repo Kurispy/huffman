@@ -36,8 +36,8 @@ public:
     void createTree();
     void encode();
     void writeOut();
-    int findMinChar(HuffNode &huffnode1, HuffNode &huffnode2);
-    void DFS(HuffNode &huffnode, int code);
+    int findMinChar(HuffNode *huffnode1, HuffNode *huffnode2);
+    void DFS(HuffNode *huffnode, int code);
     int asBits(int character, char *bits);
 };
 

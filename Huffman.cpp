@@ -129,7 +129,7 @@ void Huffman::encode() {
 
 void Huffman::writeOut() {
     int next, size;
-    char bits[4] = {NULL, NULL, NULL, NULL};
+    char bits[4] = {0, 0, 0, 0};
     
     //Magic cookie
     cout << "HUFFMA3\0";
@@ -147,28 +147,28 @@ void Huffman::writeOut() {
     }
 }
 
-int Huffman::findMinChar(HuffNode &huffnode1, HuffNode &huffnode2) {
-    if (huffnode1.min_char < huffnode2.min_char)
-        return huffnode1.min_char;
+int Huffman::findMinChar(HuffNode *huffnode1, HuffNode *huffnode2) {
+    if (huffnode1->min_char < huffnode2->min_char)
+        return huffnode1->min_char;
     else
-        return huffnode2.min_char;
+        return huffnode2->min_char;
 }
 
-void Huffman::DFS(HuffNode &huffnode, int code) {
-    if (huffnode.left != NULL)
-        DFS(huffnode.left, (code << 1));
-    if (huffnode.right != NULL)
-        DFS(huffnode.right, (code << 1) + 1);
-    if (huffnode.left == NULL && huffnode.right == NULL)
-        code_table_[huffnode.min_char] = code;
+void Huffman::DFS(HuffNode *huffnode, int code) {
+    if (huffnode->left != NULL)
+        DFS(huffnode->left, (code << 1));
+    if (huffnode->right != NULL)
+        DFS(huffnode->right, (code << 1) + 1);
+    if (huffnode->left == NULL && huffnode->right == NULL)
+        code_table_[huffnode->min_char] = code;
 }
 
 int Huffman::asBits(int character, char *bits) {
     int size, k = 1;
-    bits[0] = NULL;
-    bits[1] = NULL;
-    bits[2] = NULL;
-    bits[3] = NULL;
+    bits[0] = 0;
+    bits[1] = 0;
+    bits[2] = 0;
+    bits[3] = 0;
     
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 8; j++) {
