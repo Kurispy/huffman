@@ -4,6 +4,7 @@ output
 *.txt
 *.[oa]
 *~
+*.sh
 /nbproject/
 /input/
 /output/

@@ -1,7 +1,7 @@
 #ifndef HUFFMAN_H
 #define	HUFFMAN_H
 
-#include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -29,15 +29,16 @@ public:
 class Huffman {
 private:
     unsigned int frequency_list_[256];
-    unsigned int code_table_[256];
+    string code_table_[256];
     PriorityQueue queue_;
 public:
+    Huffman();
     void readData();
     void createTree();
     void encode();
     void writeOut();
     int findMinChar(HuffNode *huffnode1, HuffNode *huffnode2);
-    void DFS(HuffNode *huffnode, int code);
+    void DFS(HuffNode *huffnode, string code);
     int asBits(int character, char *bits);
 };
 

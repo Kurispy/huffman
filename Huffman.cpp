@@ -1,3 +1,5 @@
+#include <cstdlib>
+#include <iostream>
 #include "Huffman.h"
 
 using namespace std;
@@ -31,7 +33,7 @@ void PriorityQueue::insert(HuffNode *node) {
     }
     else {
         front_[size_++] = node;
-        siftUp(size_ - 1, (size_ - 1) / 2);
+        siftUp(size_ - 1, (size_ - 2) / 2);
     }
 }
 
@@ -52,11 +54,11 @@ void PriorityQueue::siftUp(int child, int parent) {
     if (child == 0)
         return;
     
-    if (front_[parent] < front_[child]) {
+    if (*(front_[parent]) < *(front_[child])) {
         temp = front_[parent];
         front_[parent] = front_[child];
         front_[child] = temp;
-        siftUp(parent, parent / 2);
+        siftUp(parent, (parent - 1) / 2);
     }
 }
 
@@ -64,8 +66,8 @@ void PriorityQueue::siftDown(int parent) {
     HuffNode *temp;
     
     if (parent * 2 + 2 <= size_ - 1) {
-        if (front_[parent] < front_[parent * 2 + 1] || front_[parent] < front_[parent * 2 + 2]) {
-            if (front_[parent * 2 + 1] < front_[parent * 2 + 2]) {
+        if (*(front_[parent]) < *(front_[parent * 2 + 1]) || *(front_[parent]) < *(front_[parent * 2 + 2])) {
+            if (*(front_[parent * 2 + 1]) < *(front_[parent * 2 + 2])) {
                 temp = front_[parent];
                 front_[parent] = front_[parent * 2 + 2];
                 front_[parent * 2 + 2] = temp;
@@ -80,12 +82,22 @@ void PriorityQueue::siftDown(int parent) {
         }
     }
     else if (parent * 2 + 1 <= size_ - 1) {
-        if (front_[parent] < front_[parent * 2 + 1]) {
+        if (*(front_[parent]) < *(front_[parent * 2 + 1])) {
             temp = front_[parent];
             front_[parent] = front_[parent * 2 + 1];
             front_[parent * 2 + 1] = temp;
             siftDown(parent * 2 + 1);
         }
+    }
+}
+
+Huffman::Huffman() {
+    for (int i = 0; i < 256; i++) {
+        frequency_list_[i] = 0;
+    }
+    
+    for (int i = 0; i < 256; i++) {
+        code_table_[i] = "";
     }
 }
 
@@ -105,7 +117,6 @@ void Huffman::createTree() {
         if (frequency_list_[i] > 0) {
             huffnode = new HuffNode(i, frequency_list_[i], NULL, NULL);
             queue_.insert(huffnode);
-            queue_.size_++;
         }
     }
     
@@ -113,7 +124,7 @@ void Huffman::createTree() {
     while (queue_.size_ > 1) {
         huffnode = queue_.front();
         queue_.deletefront();
-        if (huffnode < queue_.front())
+        if (*(huffnode) < *(queue_.front()))
             huffnode = new HuffNode(findMinChar(huffnode, queue_.front()), huffnode->weight + queue_.front()->weight, huffnode, queue_.front());
         else
             huffnode = new HuffNode(findMinChar(huffnode, queue_.front()), huffnode->weight + queue_.front()->weight, queue_.front(), huffnode);
@@ -124,7 +135,7 @@ void Huffman::createTree() {
 }
 
 void Huffman::encode() {
-    DFS(queue_.front(), 0);
+    DFS(queue_.front(), "");
 }
 
 void Huffman::writeOut() {
@@ -141,7 +152,7 @@ void Huffman::writeOut() {
     
     //Data
     while (!cin.eof()) {
-        next = cin.get();
+        next = cin.get(); //Why is this returning -1?
         size = asBits(next, bits);
         cout.write(bits, size);
     }
@@ -154,30 +165,25 @@ int Huffman::findMinChar(HuffNode *huffnode1, HuffNode *huffnode2) {
         return huffnode2->min_char;
 }
 
-void Huffman::DFS(HuffNode *huffnode, int code) {
+void Huffman::DFS(HuffNode *huffnode, string code) {
     if (huffnode->left != NULL)
-        DFS(huffnode->left, (code << 1));
+        DFS(huffnode->left, code += '0');
     if (huffnode->right != NULL)
-        DFS(huffnode->right, (code << 1) + 1);
+        DFS(huffnode->right, code += '1');
     if (huffnode->left == NULL && huffnode->right == NULL)
         code_table_[huffnode->min_char] = code;
 }
 
 int Huffman::asBits(int character, char *bits) {
-    int size, k = 1;
     bits[0] = 0;
     bits[1] = 0;
     bits[2] = 0;
     bits[3] = 0;
     
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 8; j++) {
-            *(bits + i) += (code_table_[character] & (k << (i * 8 + j))) >> j;
-            *(bits + i) = *(bits + i) << 1;
-        }
-        if (*(bits + i) != 0)
-            size = i + 1;
+    for (unsigned int i = 0; i < code_table_[character].size(); i++) {
+        *(bits + i / 8) += (int) code_table_[character].at(i) - '0';
+        *(bits + i / 8) = *(bits + i / 8) << 1;
     }
     
-    return size;
+    return (code_table_[character].size() - 1) / 8 + 1;
 }
