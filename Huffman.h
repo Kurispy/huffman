@@ -10,36 +10,35 @@ struct HuffNode {
     unsigned int weight;
     HuffNode *left;
     HuffNode *right;
+    HuffNode(int _min_char, unsigned int _weight, HuffNode *_left, HuffNode *_right);
     bool operator<(HuffNode &rhs);
 };
 
-struct QueueNode {
-    HuffNode *huff;
-    QueueNode *left;
-    QueueNode *right;
-};
-
 class PriorityQueue {
-    QueueNode *front_;
+    HuffNode *front_[256];
 public:
     int size_;
-    void insert(QueueNode *node);
+    PriorityQueue();
+    void insert(HuffNode *node);
     void deletefront();
-    QueueNode* front();
+    HuffNode* front();
+    void siftUp(int child, int parent);
+    void siftDown(int parent);
 };
 
 class Huffman {
 private:
     unsigned int frequency_list_[256];
-    int code_table_[256];
+    unsigned int code_table_[256];
     PriorityQueue queue_;
 public:
     void readData();
     void createTree();
     void encode();
     void writeOut();
-    int findMinChar();
-    void DFS(HuffNode *huffnode, int code);
+    int findMinChar(HuffNode &huffnode1, HuffNode &huffnode2);
+    void DFS(HuffNode &huffnode, int code);
+    int asBits(int character, char *bits);
 };
 
 #endif	/* HUFFMAN_H */
