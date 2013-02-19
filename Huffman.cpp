@@ -106,6 +106,7 @@ void Huffman::readData() {
         frequency_list_[cin.get()]++;
     
     //Reset get pointer to the beginning of the stream
+    cin.clear();
     cin.seekg(0);
 }
 
@@ -139,11 +140,8 @@ void Huffman::encode() {
 }
 
 void Huffman::writeOut() {
-    int next, size;
-    char bits[4] = {0, 0, 0, 0};
-    
     //Magic cookie
-    cout << "HUFFMA3\0";
+    cout << "HUFFMA3" << '\0';
     
     //Frequencies
     for (int i = 0; i < 256; i++) {
@@ -151,11 +149,7 @@ void Huffman::writeOut() {
     }
     
     //Data
-    while (!cin.eof()) {
-        next = cin.get(); //Why is this returning -1?
-        size = asBits(next, bits);
-        cout.write(bits, size);
-    }
+    asBits();
 }
 
 int Huffman::findMinChar(HuffNode *huffnode1, HuffNode *huffnode2) {
@@ -166,24 +160,43 @@ int Huffman::findMinChar(HuffNode *huffnode1, HuffNode *huffnode2) {
 }
 
 void Huffman::DFS(HuffNode *huffnode, string code) {
-    if (huffnode->left != NULL)
+    if (huffnode->left != NULL) {
         DFS(huffnode->left, code += '0');
-    if (huffnode->right != NULL)
+        code.erase(code.end() - 1);
+    }
+    if (huffnode->right != NULL) {
         DFS(huffnode->right, code += '1');
+        code.erase(code.end() - 1);
+    }
     if (huffnode->left == NULL && huffnode->right == NULL)
         code_table_[huffnode->min_char] = code;
 }
 
-int Huffman::asBits(int character, char *bits) {
-    bits[0] = 0;
-    bits[1] = 0;
-    bits[2] = 0;
-    bits[3] = 0;
+void Huffman::asBits() {
+    int next, width = 0;
+    unsigned char buffer = 0;
     
-    for (unsigned int i = 0; i < code_table_[character].size(); i++) {
-        *(bits + i / 8) += (int) code_table_[character].at(i) - '0';
-        *(bits + i / 8) = *(bits + i / 8) << 1;
+    while (!cin.eof()) {
+        next = cin.get();
+        
+        if (next < 0)
+            break;
+    
+        for (unsigned int i = 0; i < code_table_[next].size(); i++) {
+            buffer += (((int) code_table_[next].at(i)) - '0') << 7;
+            width++;
+            if (width == 8) {
+                cout.write((char*) &buffer, 1);
+                width = 0;
+                buffer = 0;
+            }
+            else
+                buffer = buffer >> 1;
+        }
     }
     
-    return (code_table_[character].size() - 1) / 8 + 1;
+    if (width != 0) {
+        buffer = buffer >> (7 - width);
+        cout.write((char*) &buffer, 1);
+    }
 }

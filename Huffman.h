@@ -39,7 +39,7 @@ public:
     void writeOut();
     int findMinChar(HuffNode *huffnode1, HuffNode *huffnode2);
     void DFS(HuffNode *huffnode, string code);
-    int asBits(int character, char *bits);
+    void asBits();
 };
 
 #endif	/* HUFFMAN_H */

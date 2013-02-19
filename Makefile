@@ -1,3 +1,5 @@
+# tech; Chen, Christopher
+
 huffman : Huffman.o main.o 
 	g++ -Wall -g -o huffman  Huffman.o main.o 
 
