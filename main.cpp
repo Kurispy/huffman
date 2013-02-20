@@ -29,4 +29,6 @@ int main(int argc, char* argv[]) {
         
         huff_tree.readCompressedData();
     }
+    
+    return 0;
 }
