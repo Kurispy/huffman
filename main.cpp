@@ -27,6 +27,6 @@ int main(int argc, char* argv[]) {
     else if (!strcmp("-d", argv[1])) {
         //Decompress
         
-        
+        huff_tree.readCompressedData();
     }
 }

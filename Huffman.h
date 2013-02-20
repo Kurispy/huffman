@@ -28,14 +28,17 @@ public:
 
 class Huffman {
 private:
+    unsigned int size_;
     unsigned int frequency_list_[256];
     string code_table_[256];
     PriorityQueue queue_;
 public:
     Huffman();
     void readData();
+    void readCompressedData();
     void createTree();
     void encode();
+    void decode();
     void writeOut();
     int findMinChar(HuffNode *huffnode1, HuffNode *huffnode2);
     void DFS(HuffNode *huffnode, string code);

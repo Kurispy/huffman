@@ -91,7 +91,8 @@ void PriorityQueue::siftDown(int parent) {
     }
 }
 
-Huffman::Huffman() {
+Huffman::Huffman()
+: size_(0) {
     for (int i = 0; i < 256; i++) {
         frequency_list_[i] = 0;
     }
@@ -102,12 +103,31 @@ Huffman::Huffman() {
 }
 
 void Huffman::readData() {
-    while (!cin.eof())
+    while (!cin.eof()) {
         frequency_list_[cin.get()]++;
+        size_++;
+    }
     
     //Reset get pointer to the beginning of the stream
     cin.clear();
     cin.seekg(0);
+}
+
+void Huffman::readCompressedData() {
+    //Magic cookie
+    for (int i = 0; i < 8; i++)
+        cin.ignore();
+    
+    //Frequencies
+    for (int i = 0; i < 256; i++) {
+        cin.read((char*) &frequency_list_[i], 4);
+        size_ += frequency_list_[i];
+    }
+    
+    createTree();
+    
+    //Data
+    decode();
 }
 
 void Huffman::createTree() {
@@ -137,6 +157,43 @@ void Huffman::createTree() {
 
 void Huffman::encode() {
     DFS(queue_.front(), "");
+}
+
+void Huffman::decode() {
+    unsigned char buffer;
+    unsigned int numprinted = 0;
+    HuffNode *huffnode = queue_.front();
+    
+    //Single character
+    if (huffnode->left == NULL && huffnode->right == NULL) {
+        for (unsigned int i = 0; i < frequency_list_[huffnode->min_char]; i++) {
+            cout << (char) huffnode->min_char;
+            numprinted++;
+        }
+    }
+    if (numprinted == size_)
+        return;
+    
+    while (!cin.eof()) {
+        cin.read((char*) &buffer, 1);
+        
+        for (int i = 0; i < 8; i++) {
+            if (buffer % 2)
+                huffnode = huffnode->right;
+            else
+                huffnode = huffnode->left;
+
+            buffer = buffer >> 1;
+            
+            if (huffnode->left == NULL && huffnode->right == NULL) {
+                cout << (char) huffnode->min_char;
+                numprinted++;
+                huffnode = queue_.front();
+                if (numprinted == size_)
+                    return;
+            }
+        }
+    }
 }
 
 void Huffman::writeOut() {
