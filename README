@@ -1,0 +1,4 @@
+Compresses a string of characters using Huffman encoding.
+Input can be either a string of characters, in which case
+the output is a compressed file, or a compressed file, 
+in which case the output is a string of characters.
